@@ -20,7 +20,7 @@ It operates on the files and directories of the digital repository and an SQLite
 
 ## Usage
 
-$ python3 -m sancdpd
+$ python3 sancdpd
 
 
 ## License
