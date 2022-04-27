@@ -1,9 +1,14 @@
-/**************************************************************************** 
+/***************************************************************************** 
 create_tables.sql
 
 This file consists of SQL data definition statements to create the tables
-that compose the SANCdpd data model.
-****************************************************************************/
+for the SANCdpd database.
+
+The target DBMS for this database is SQLite.  However, these data definition
+statements are compatible with MySQL with only minor changes.  In particular:
+  - Replace all instanced of "AUTOINCREMENT" with "AUTO_INCREMENT".
+  - Remove the UNIQUE constraint on bag.tagmanifest_contents.
+*****************************************************************************/
 
 -- Tell the SQLite engine to enable foreign keys for the following statements
 PRAGMA foreign_keys = ON;
@@ -88,7 +93,7 @@ CREATE TABLE bag_from_accession (
     bag_id INTEGER NOT NULL,
     accession_id INTEGER,
     pseudo_accession_id INTEGER,
-    PRIMARY KEY (bag_id, accession_id, pseudo_accession_id),
+    UNIQUE (bag_id, accession_id, pseudo_accession_id),
     FOREIGN KEY (bag_id) 
         REFERENCES bag (bag_id),
     FOREIGN KEY (accession_id) 
@@ -102,6 +107,7 @@ CREATE TABLE bag_from_accession (
 CREATE TABLE bag_has_parent_bag (
     child_bag_id INTEGER NOT NULL,
     parent_bag_id INTEGER NOT NULL,
+    PRIMARY KEY (child_bag_id, parent_bag_id), 
     FOREIGN KEY (child_bag_id)
         REFERENCES bag (bag_id),
     FOREIGN KEY (parent_bag_id)
