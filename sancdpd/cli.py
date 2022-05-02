@@ -35,8 +35,8 @@ def welcome():
 # dictionary: menudefs
 ###############################################################################
 # This dictionary defines the menus for the SANCdpd CLI
-# The key is internal (non-display) key for the menu
-# For each key, there is a list that defines one menu.
+# The dictionary key is the internal (non-display) menukey for the menu.
+# For each menukey, there is a list that defines one menu.
 # The first list item is the title (breadcrumb name) of the menu.
 # Each addditional list item is a 4-tuple.
 # Each 4-tuple includes:
@@ -93,9 +93,20 @@ menudefs = {\
 # function: run_menu
 ###############################################################################
 def run_menu(branch=['main']):
+    """
+    This function handles display and interaction with the CLI menu.
+    It takes as its input a non-empty list of menukeys.  The list, from left
+    to right, captures the menu navigation depth, and is used for displaying
+    navigation breadcrumbs.  The last item in the list is the menukey for
+    the current menu to display.
+
+    This function depends on the menudefs dictionary (which is defined globally
+    for this module).  All menu content is defined in menudefs.
+    This function assumes that menudefs has a particular structure.
+    """
 
     # Create slight pause to make console interaction feel more intuitive
-    time.sleep(0.5)
+    time.sleep(0.3)
 
     # Create and print string of navigation breadcrumbs based on the branch
     crumbs = ""
@@ -115,27 +126,29 @@ def run_menu(branch=['main']):
         print("   " + op[0] + "\t" + op[1])
 
 
-    #
+    # Variables to capture the menu action
     next_action = ""
     action_spec = ""
 
-    # loop until we get valid user input
+    # Loop input prompt until we get valid user input
     while next_action == "":
-        # get raw user in put
+        # Get raw user input from prompt
         rawin = input("?> ")
 
-        # take only the first three characters, and make lowercase
+        # Take only the first three characters, and make letters lowercase
         normin = rawin[:3].lower()
 
-        # check to see if input matches a valid menu option
+        # Check to see if input matches a valid option in the current menu
         for op in menudefs[branch[-1]][1:]:
             if normin == op[0]:
                 next_action = op[2]
                 action_spec = op[3]
 
+        # If the we didn't manage to set the next action, the input was invalid
         if next_action == "":
             print("-- Invalid entry. --")
 
+    # Take the appropriate action based on the
     if next_action == "menu":
         run_menu(branch + [action_spec])
     elif next_action == "back":
