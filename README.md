@@ -9,13 +9,16 @@ It operates on the files and directories of the digital repository and an SQLite
 
 ## Installation
 
-- Copy or extract the full SANCdpd directory to a user directory.  
+- Copy or extract the full SANCdpd directory to a user directory.
 
 - Create a config file called SANCdpd_config.json.  (See the resources directory for template and an example.)
 
+- SANCdpd will check for the config file in the SANCdpd directory (the same directory as this README.md file).
+
+- Make sure your config file points at an appropriate directory for storing log files.
+
 - Make sure your config file points at a proper SANCdpd SQLite database.
 
-- SANCdpd will check for the config file in the SANCdpd directory (the same directory as this README.md file).
 
 
 ## Usage
