@@ -2,7 +2,8 @@
 This module runs the CLI for SANCdpd.
 """
 # Import modules from the Python standard library
-import time
+import time                  # for the sleep() function
+
 
 # Import other SANCdpd modules
 import conf
@@ -10,6 +11,7 @@ import logger as lg
 
 
 # Update the version number as appropriate
+# Should match the version number noted in the project README.md file.
 VERSION = "0.0.1"
 
 
@@ -49,6 +51,10 @@ def welcome():
 #    - Within a menu, the order of the options matters.
 #    - The order in which menus are defined in the menudefs dictionary does
 #      not matter
+# Note about the code formatting:
+#    - The formatting of the following code defining the dictionary is not
+#      very Pythonic.  This formatting has been used for the special purpose of
+#      making it easy to read and edit the menus.
 ###############################################################################
 menudefs = {\
 "main": ["MAIN MENU",
@@ -92,7 +98,7 @@ menudefs = {\
 ###############################################################################
 # function: run_menu
 ###############################################################################
-def run_menu(branch=['main']):
+def run_menu(branch):
     """
     This function handles display and interaction with the CLI menu.
     It takes as its input a non-empty list of menukeys.  The list, from left
@@ -161,8 +167,13 @@ def run_menu(branch=['main']):
 # function: run_proc
 ###############################################################################
 def run_proc(procname):
-    print("Running", procname)
 
+    #print("Running", procname)
+
+    if procname == "quit":
+        lg.log("Received 'quit' command.  Exiting.")
+        print("\n   Exiting now.  Goodbye.\n")
+        return 0;
 
 
 ###############################################################################
@@ -172,11 +183,21 @@ def startcli():
     """
     This is the first function that should be run for the CLI.
     """
+
+    # Print intial welcome message for SANCdpd CLI
     welcome()
-    conf.read()
-    lg.begin()
+
+    # Read SANCdpd config file and assign values in the fconf dictionary
+    conf.readfile()
+
+    # Begin logging to logfile (if logging is set on the config file).
+    if conf.fconf["logging"]:
+        lg.begin()
+
     conf.validate()
-    run_menu()
+
+    # Run main menu for the CLI.
+    run_menu(['main'])
 
 
 ###############################################################################
