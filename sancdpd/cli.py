@@ -204,7 +204,8 @@ def startcli():
     if conf.fconf["logging"]:
         lg.begin()
 
-    #dbops.check_connection()
+    # Test ability to connect to the database
+    dbops.test_connect()
 
     # Load values from reference tables into global variables
     conf.loadref()
