@@ -32,4 +32,3 @@ VALUES
 ('SOFTW', True, 'SANCdpd CLI', NULL, NULL, STRFTIME('%Y-%m-%dT%H:%M:%S',DATETIME('now', 'localtime')), '0.1.0'),
 ('ORGZN', True, 'SANC DSS', 'SANCDS', NULL, STRFTIME('%Y-%m-%dT%H:%M:%S',DATETIME('now', 'localtime')), NULL)
 ;
-
