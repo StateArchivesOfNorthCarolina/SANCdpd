@@ -54,6 +54,7 @@ req_conf_keys = ["logging",
 fconf = {}
 
 # Dictionary for config info generated during currently running session
+# (as needed; functionality that depends on this should be commented.)
 sconf = {}
 
 # List of event types, queried from the database.

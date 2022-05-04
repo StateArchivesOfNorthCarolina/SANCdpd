@@ -45,6 +45,7 @@ def check_db():
            conf.fconf["dbfile"])
     cur = con.cursor()
 
+
     # Now, do some basic queries to see if it looks like a real SANCdpd db
 
     # Query the event_type and event_type_outcome tables for diagnostics

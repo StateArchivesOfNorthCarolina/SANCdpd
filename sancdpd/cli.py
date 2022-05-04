@@ -1,5 +1,15 @@
 """
 This module runs the CLI for SANCdpd.
+
+This module includes these functions:
+    startcli() :  Starts the CLI by running other functions
+    welcome() :  Just prints a welcome message
+    run_menu() :  Implements the CLI menu system
+    run_proc() :  Passes control to the procedure to be run
+
+This module also defines a global data structure called menudefs, which defines
+the menus displayed by run_menu().
+
 """
 
 # Import modules from the Python standard library
@@ -11,8 +21,8 @@ import logger as lg
 import dbops
 
 # Import SANCdpd modules for running operational scenarios
-import operational.agentmgmt
 import operational.bagmgmt
+import operational.agentmgmt
 
 
 # The name of the software agent currently running, as known to the SANCdpd
@@ -120,9 +130,11 @@ def run_menu(branch):
     for this module).  All menu content is defined in menudefs.
     This function assumes that menudefs has a particular structure.
 
-    Note that this is a recursive function:  It can call itself.  When it
-    finishes, it will return control to the function that called it, which
-    might be itself.
+    Note that this is a recursive function:  It can call itself, based on user
+    input, to generate the next level of menu.  When the "quit" command is
+    received, that is the base case of the recusion, in which it does not call
+    itself again.  It will return control to the function that called it, which
+    might be itself, or might the start_cli function.
     """
 
     # Create very slight pause to make console interaction feel more intuitive
@@ -193,8 +205,8 @@ def run_menu(branch):
         # Note that this option does not directly call an exit function.
         # It "quits" simply by not calling the run_menu function again.
         # Thus, it is the base case of the recursion.
-        lg.log("Received 'quit' command from menu.  Returning.")
-        print("\n   Exiting now.  Goodbye.\n")
+        lg.log("run_menu: Received 'quit' command from menu.  Returning.")
+        print("\n   Exiting the SANCdpd CLI menu system now.  Goodbye.\n")
 
     # If control is returned to the menu with no further directive, then exit
     # with normal status.
@@ -213,7 +225,7 @@ def run_proc(procname):
     This function basically serves as a switch statement that takes a menu
     command and then executes the relevant procedure.
 
-    There should be one if or elif clause for each procname used in the
+    There should be one "if" or "elif" clause for each procname used in the
     menu system.
 
     Typically, there will be only a few lines of code for each of the possible
@@ -223,16 +235,17 @@ def run_proc(procname):
 
     lg.log("Menu command: " + procname + ". Will attempt to execute.")
 
-    if procname == "show_agents":
-        operational.agentmgmt.show_agents()
-
-    elif procname == "ingest":
+    if procname == "ingest":
         operational.bagmgmt.new_ingest()
+
+    elif procname == "show_agents":
+        operational.agentmgmt.show_agents()
 
     else:
         print("   Procedure '" + procname + "' not yet implemented.")
 
     input("   Press Enter to continue.")
+
 
 
 ###############################################################################
