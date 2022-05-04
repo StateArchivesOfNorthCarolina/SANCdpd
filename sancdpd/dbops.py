@@ -75,7 +75,6 @@ def check_db():
     # Close cursor and connection
     cur.close()
     con.close()
-    lg.log("check_db: Database connection closed.")
 
 
 ###############################################################################

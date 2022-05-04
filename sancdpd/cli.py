@@ -10,6 +10,10 @@ import conf
 import logger as lg
 import dbops
 
+# Import SANCdpd modules for running operational scenarios
+import operational.agentmgmt
+import operational.bagmgmt
+
 
 # The name of the software agent currently running, as known to the SANCdpd
 # database in the `agent`.`agent_name` field.
@@ -50,7 +54,7 @@ def welcome():
 # Each 4-tuple includes:
 #    - the option's keyboard command (1-3 lowercase alphanumeric characters)
 #    - the option's description (for menu display purposes only)
-#    - the program's action type: "menu", "proc", "back"
+#    - the options's action type: "menu", "proc", "back", "quit"
 #    - the menu or proc key
 #      (which links to other menus or says which procedure to run)
 # Notes on ordering:
@@ -71,7 +75,7 @@ menudefs = {\
     ("r", "Generate reports", "menu", "reports"),
     ("a", "Manage agents", "menu", "agent"),
     ("s", "Manage storage", "menu", "storage"),
-    ("q", "Quit SANCdpd CLI", "proc", "quit")
+    ("q", "Quit SANCdpd CLI", "quit", "")
     ],
 "recevents": ["Event Recording",
     ("b", "Go back", "back", "")
@@ -115,6 +119,10 @@ def run_menu(branch):
     This function depends on the menudefs dictionary (which is defined globally
     for this module).  All menu content is defined in menudefs.
     This function assumes that menudefs has a particular structure.
+
+    Note that this is a recursive function:  It can call itself.  When it
+    finishes, it will return control to the function that called it, which
+    might be itself.
     """
 
     # Create very slight pause to make console interaction feel more intuitive
@@ -125,7 +133,7 @@ def run_menu(branch):
     for menu in branch:
         crumbs += (">> " + menudefs[menu][0] + "  ")
     crumbs += ">>"
-    print("")
+    print("\n")
     print("".join([">" for i in range(len(crumbs))]))
     print(crumbs)
     print("".join([">" for i in range(len(crumbs))]))
@@ -163,13 +171,35 @@ def run_menu(branch):
         if next_action == "":
             print("-- Invalid entry. --")
 
-    # Take the appropriate action based on the
+
+    # Take the appropriate action based on the type of next action
+
     if next_action == "menu":
+        # Add a level to the branch and run the menu
         run_menu(branch + [action_spec])
+
     elif next_action == "back":
+        # Run the menu without the last level of the branch
         run_menu(branch[:-1])
+
     elif next_action == "proc":
+        # Run the procedure specified, by passing the option to run_proc
         run_proc(action_spec)
+
+        # After running the procedure, run menu from the same level
+        run_menu(branch)
+
+    elif next_action == "quit":
+        # Note that this option does not directly call an exit function.
+        # It "quits" simply by not calling the run_menu function again.
+        # Thus, it is the base case of the recursion.
+        lg.log("Received 'quit' command from menu.  Returning.")
+        print("\n   Exiting now.  Goodbye.\n")
+
+    # If control is returned to the menu with no further directive, then exit
+    # with normal status.
+    return 0
+
 
 
 ###############################################################################
@@ -183,27 +213,26 @@ def run_proc(procname):
     This function basically serves as a switch statement that takes a menu
     command and then executes the relevant procedure.
 
+    There should be one if or elif clause for each procname used in the
+    menu system.
+
     Typically, there will be only a few lines of code for each of the possible
     menu comands, because control will quicly be handed off to a function in
     the module for the relevant operational scenario.
     """
 
-    if procname == "quit":
-        lg.log("Received 'quit' command from menu.  Exiting.")
-        print("\n   Exiting now.  Goodbye.\n")
-        return 0;
+    lg.log("Menu command: " + procname + ". Will attempt to execute.")
+
+    if procname == "show_agents":
+        operational.agentmgmt.show_agents()
+
     elif procname == "ingest":
-        lg.log("Menu command: " + procname + ". Will attempt to execute.")
-        print("Running procedure: ", procname, "...")
-        time.sleep(2)
-        print("Preparing for ingest...")
-        time.sleep(2)
-        print("\nJust kidding.  lol")
-        time.sleep(2)
-        run_menu(['main'])
+        operational.bagmgmt.new_ingest()
+
     else:
-        print("Procedure", procname, "not yet implemented")
-        run_menu(['main'])
+        print("   Procedure '" + procname + "' not yet implemented.")
+
+    input("   Press Enter to continue.")
 
 
 ###############################################################################
@@ -232,6 +261,9 @@ def startcli():
 
     # Run main menu for the CLI.
     run_menu(['main'])
+
+    # When run_menu returns, we're done
+    return 0
 
 
 ###############################################################################

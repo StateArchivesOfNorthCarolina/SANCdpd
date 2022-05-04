@@ -72,7 +72,6 @@ def begin():
     print("")
     print("   " + "Runtime logging activated.")
     print("   " + logfilename)
-    print("")
 
     # Log first message.
     log("Logging begun successfully.")
