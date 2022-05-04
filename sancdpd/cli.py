@@ -16,9 +16,8 @@ import dbops
 SOFTW_AGENT_NAME = "SANCdpd CLI"
 
 # Update the version number as appropriate
-# Should match the version number noted in the project README.md file.
 # Must match the `agent`.`agent_version` field in the SANCdpd database
-VERSION = "0.0.1"
+VERSION = "0.1.0"
 
 
 ###############################################################################
@@ -44,6 +43,7 @@ def welcome():
 ###############################################################################
 # This dictionary defines the menus for the SANCdpd CLI
 # The dictionary key is the internal (non-display) menukey for the menu.
+# Submenus are created by including the menukey as an option within a menu
 # For each menukey, there is a list that defines one menu.
 # The first list item is the title (breadcrumb name) of the menu.
 # Each addditional list item is a 4-tuple.
@@ -117,7 +117,7 @@ def run_menu(branch):
     This function assumes that menudefs has a particular structure.
     """
 
-    # Create slight pause to make console interaction feel more intuitive
+    # Create very slight pause to make console interaction feel more intuitive
     time.sleep(0.3)
 
     # Create and print string of navigation breadcrumbs based on the branch
@@ -147,6 +147,9 @@ def run_menu(branch):
         # Get raw user input from prompt
         rawin = input("?> ")
 
+        # Very short pause
+        time.sleep(0.1)
+
         # Take only the first three characters, and make letters lowercase
         normin = rawin[:3].lower()
 
@@ -173,17 +176,34 @@ def run_menu(branch):
 # function: run_proc
 ###############################################################################
 def run_proc(procname):
+    """
+    This function take a procname, as specified in a menu option, and executes
+    the relevant commands.
 
-    #print("Running", procname)
+    This function basically serves as a switch statement that takes a menu
+    command and then executes the relevant procedure.
+
+    Typically, there will be only a few lines of code for each of the possible
+    menu comands, because control will quicly be handed off to a function in
+    the module for the relevant operational scenario.
+    """
 
     if procname == "quit":
-        lg.log("Received 'quit' command.  Exiting.")
+        lg.log("Received 'quit' command from menu.  Exiting.")
         print("\n   Exiting now.  Goodbye.\n")
         return 0;
-    else:
-        print("Running procedure", procname, "...")
+    elif procname == "ingest":
+        lg.log("Menu command: " + procname + ". Will attempt to execute.")
+        print("Running procedure: ", procname, "...")
         time.sleep(2)
-        print("Just kidding.  lol")
+        print("Preparing for ingest...")
+        time.sleep(2)
+        print("\nJust kidding.  lol")
+        time.sleep(2)
+        run_menu(['main'])
+    else:
+        print("Procedure", procname, "not yet implemented")
+        run_menu(['main'])
 
 
 ###############################################################################
@@ -208,7 +228,7 @@ def startcli():
     dbops.check_db()
 
     # Load values from reference tables into global variables
-    conf.loadref()
+    dbops.loadref()
 
     # Run main menu for the CLI.
     run_menu(['main'])

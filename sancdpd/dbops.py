@@ -5,7 +5,9 @@ The SANCdpd database is structured according to the schema specified and
 described in the SANCdpd data dictionary.  The database itself is created in
 SQLite version 3.
 
-
+This module contains the following functions:
+    checkdb(): Checks connection and does basic validation of the database
+    loadref() : Read database reference tables and write global lists
 """
 
 # Import modules from the Python standard library
@@ -37,23 +39,20 @@ def check_db():
         print("No file found at location:", conf.fconf["dbfile"])
         raise Exception("Database file not found.")
 
-    # Create db connection
+    # Create db connection and cursor
     con = sq.connect(conf.fconf["dbfile"])
-    lg.log("Successfully connected to SQLite database at:" +
+    lg.log("check_db: Successfully connected to SQLite database at:" +
            conf.fconf["dbfile"])
-
-    # Do some basic queries to see if it looks like a real SANCdpd database
-
-    # Create cursor
     cur = con.cursor()
 
+    # Now, do some basic queries to see if it looks like a real SANCdpd db
 
     # Query the event_type and event_type_outcome tables for diagnostics
-    etypes = cur.execute("SELECT * FROM event_type").fetchall()
-    otypes = cur.execute("SELECT * FROM event_type_outcome").fetchall()
+    evttypes = cur.execute("SELECT * FROM event_type").fetchall()
+    outtypes = cur.execute("SELECT * FROM event_type_outcome").fetchall()
 
     # If not much data in those tables, print warning (but no exception)
-    if len(etypes) < 3 or len(otypes) < 2:
+    if len(evttypes) < 3 or len(outtypes) < 2:
         print("Warning:  Little or no data in event reference tables.")
 
 
@@ -76,4 +75,48 @@ def check_db():
     # Close cursor and connection
     cur.close()
     con.close()
-    lg.log("Database connection closed.")
+    lg.log("check_db: Database connection closed.")
+
+
+###############################################################################
+# function: loadref
+###############################################################################
+def loadref():
+    """
+    Load data from database reference tables for easy access.
+    Create global variables with data structures capturing records from
+        `event_type`
+        `event_type_outcome`
+    """
+
+    # Create db connection and cursor
+    con = sq.connect(conf.fconf["dbfile"])
+    cur = con.cursor()
+
+
+    # Query event_type and set global list
+    qstr = """SELECT event_type_code, event_name, event_category_code
+              FROM event_type"""
+    conf.etypes = cur.execute(qstr).fetchall()
+
+    lg.log("loadref: Loaded values from event_type table")
+
+
+    # Create global dictionary of outcomes
+
+    # First, writ the query string to get the otypes for a given etype
+    qstr = """SELECT outcome_code, outcome_name
+              FROM event_type_outcome
+              WHERE event_type_code = ?"""
+
+    # Loop through the etypes to set valid otypes for each
+    for et in conf.etypes:
+        qargs = (et[0],)
+        conf.otypes[et[0]] = cur.execute(qstr, qargs).fetchall()
+
+    lg.log("loadref: Loaded values from event_type_outcome table")
+
+
+    # Close cursor and connection
+    cur.close()
+    con.close()

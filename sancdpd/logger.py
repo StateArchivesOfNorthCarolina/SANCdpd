@@ -4,6 +4,10 @@ It depends on a valid logfile directory being specified in the config file.
 This module contains only two functions:
     begin() :  Tell logger to begin logging this session.
     log(msg) : Tell logger to add msg to session log.
+
+To use the logging functionality in other modules, some module must call the
+begin() function (and this function should be called only once).
+After that, logging occurs whenever the log() function is called.
 """
 
 # Import modules from the Python standard library

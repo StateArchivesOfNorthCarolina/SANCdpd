@@ -1,9 +1,20 @@
 """
 This module manages config information used by the rest of the SANCdpd package.
 
-It creates and sets global data structures, for sharing across modules.
+This module exposes several global variables for use by this and other modules:
+    fconf: a dictionary of config values from the config file
+    sconf: a dictionary of config values set a runtime (if any)
+    event_types:  a list of event types from the database
+    event_type_outcomes: a dictionary of lists of outcomes for each event type
 
-It depends on the existence of a SANCdpd config file and a SANCdpd database.
+The fconf variable is set by a function in this module.  Other variables are
+set by functions in other modules.
+
+The event_types and event_type_outcomes variables are useful for, among other
+purposes, creating menus or select lists to allow the user to choose the
+appropraite event types and the valid outcomes for a given event type.
+
+This module depends on a valid SANCdpd config file.
 
 It is expected that the config file is JSON with at least the following keys:
     logging: whether to enable logging ("true" or "false")
@@ -13,19 +24,16 @@ It is expected that the config file is JSON with at least the following keys:
     access_path_root: The path to the access storage location (ends with "/")
 (Note that these match the req_conf_keys list defined below.)
 
-This module exposes several global variables for use by this and other modules:
-    fconf: a dictionary of config values from the config file
-    event_types:  a list of event types from the database
-    event_type_outcomes: a dictionary of lists of outcomes for each event type
-
-This module contains two functions:
+This module contains the following function:
     readfile() :  Read the configuration file and write global fconf variable
-    loadref() : Read database reference tables and write global lists
 """
 
 # Import modules from the Python standard library
 import json                  # for reading the config file
 import os.path               # for checking for the config file
+
+# Import other SANCdpd modules
+import logger as lg
 
 
 ###############################################################################
@@ -51,12 +59,14 @@ sconf = {}
 # List of event types, queried from the database.
 # Each event type is represented as an ordered triple as follows:
 #    (event_type_code, event_name, event_category_code)
-event_types = []
+etypes = []
 
 # Dictionary of lists of event outcomes, queried from the database.
 # The key for each entry is an event_type_code
-# The value for each entry is a list of outcome_code's for that event_type
-event_type_outcomes = {}
+# The value for each entry is a list of outcomes typesfor that event_type
+# Each outcome type is represented as an ordered pair as follows:
+#    (outcome_code, outcome_name)
+otypes = {}
 
 
 ###############################################################################
@@ -104,18 +114,3 @@ def readfile():
     for k in req_conf_keys:
         if k not in fconf.keys():
             raise Exception("Key '" + k + "' not found/read in config file.")
-
-
-
-###############################################################################
-# function: loadref
-###############################################################################
-def loadref():
-    """
-    Load data from database reference tables for easy access.
-    Create global variables with data structures capturing records from
-        `event_type`
-        `event_type_outcome`
-    """
-    # need to implement
-    pass
