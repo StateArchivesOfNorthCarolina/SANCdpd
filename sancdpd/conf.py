@@ -10,6 +10,15 @@ It is expected that the config file is JSON with at least the following keys:
     logdir: path to logfile directory (ends with "/")
     dbfile: path to the SANCdpd SQLite database file
     person_agent_code: SANCdpd's code for the default person agent
+
+This module exposes several global variables for use by this and other modules:
+    fconf: a dictionary of config values from the config file
+    event_types:  a list of event types from the database
+    event_type_outcomes: a dictionary of lists of outcomes for each event type
+
+This module contains two functions:
+    readfile() :  Read the configuration file and write global fconf variable
+    loadref() : Read database reference tables and write global lists
 """
 
 # Import modules from the Python standard library
@@ -25,8 +34,16 @@ import os.path               # for checking for the config file
 # (This shouldn't change once readfile() has been run once.)
 fconf = {}
 
+# List of event types, queried from the database.
+# Each event type is represented as an ordered triple as follows:
+#    (event_type_code, event_name, event_category_code)
 event_types = []
-event_type_outcomes = []
+
+# Dictionary of lists of event outcomes, queried from the database.
+# The key for each entry is an event_type_code
+# The value for each entry is a list of outcome_code's for that event_type
+event_type_outcomes = {}
+
 
 ###############################################################################
 # function: readfile
@@ -81,4 +98,5 @@ def loadref():
         `event_type`
         `event_type_outcome`
     """
+    # need to implement
     pass

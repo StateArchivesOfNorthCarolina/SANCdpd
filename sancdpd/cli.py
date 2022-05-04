@@ -1,13 +1,14 @@
 """
 This module runs the CLI for SANCdpd.
 """
+
 # Import modules from the Python standard library
 import time                  # for the sleep() function
-
 
 # Import other SANCdpd modules
 import conf
 import logger as lg
+import dbops
 
 
 # The name of the software agent currently running, as known to the SANCdpd
@@ -203,7 +204,7 @@ def startcli():
     if conf.fconf["logging"]:
         lg.begin()
 
-    #db.check()
+    #dbops.check_connection()
 
     # Load values from reference tables into global variables
     conf.loadref()
