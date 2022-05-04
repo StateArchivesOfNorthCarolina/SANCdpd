@@ -20,21 +20,16 @@ import logger as lg
 
 
 ###############################################################################
-# Global variable for the database connection
+# function: check_db
 ###############################################################################
-
-#dbcon = ""  # is the needed?  Better to pass a connection around, when necessary?
-
-
-###############################################################################
-# function: test_connect
-###############################################################################
-def test_connect():
+def check_db():
     """
     Tests whether there seems to be a valid SANCdpd database in the file
     specified by the config file.
-    Fails with errors or exceptions if the file isn't found or if the database
-    doesn't have basic event type reference tables.
+    Fails with errors or exceptions if any of the following:
+      - the file isn't found
+      - the database doesn't have basic event type reference tables
+      - the person agent from config file is not in the agents table
     """
 
     # Check to see if the SANCdpd SQLite database exists
@@ -44,11 +39,14 @@ def test_connect():
 
     # Create db connection
     con = sq.connect(conf.fconf["dbfile"])
-    lg.log("test_connect: Connected to SQLite database at:" +
+    lg.log("Successfully connected to SQLite database at:" +
            conf.fconf["dbfile"])
+
+    # Do some basic queries to see if it looks like a real SANCdpd database
 
     # Create cursor
     cur = con.cursor()
+
 
     # Query the event_type and event_type_outcome tables for diagnostics
     etypes = cur.execute("SELECT * FROM event_type").fetchall()
@@ -58,6 +56,24 @@ def test_connect():
     if len(etypes) < 3 or len(otypes) < 2:
         print("Warning:  Little or no data in event reference tables.")
 
+
+    # Query the agents table to confirm the agent specified in the config file
+    # is an active person agent in the database
+    qstr = """SELECT agent_name, agent_code
+              FROM agent
+              WHERE agent_code = ?"""
+    qargs = (conf.fconf["person_agent_code"],)
+    agentrows = cur.execute(qstr, qargs).fetchall()
+
+    if len(agentrows) != 1:
+        erstr = "Person agent from config file not uniquely in agents table."
+        raise Exception(erstr)
+
+    lg.log("Active person agent " +
+           agentrows[0][0] + " (" + agentrows[0][1] + ") " +
+           "found in database.")
+
+    # Close cursor and connection
     cur.close()
     con.close()
-    lg.log("test_connect: Database connection closed.")
+    lg.log("Database connection closed.")

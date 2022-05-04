@@ -204,8 +204,8 @@ def startcli():
     if conf.fconf["logging"]:
         lg.begin()
 
-    # Test ability to connect to the database
-    dbops.test_connect()
+    # Check that we have access to a usable SANCdpd database
+    dbops.check_db()
 
     # Load values from reference tables into global variables
     conf.loadref()

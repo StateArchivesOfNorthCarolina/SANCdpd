@@ -10,6 +10,8 @@ It is expected that the config file is JSON with at least the following keys:
     logdir: path to logfile directory (ends with "/")
     dbfile: path to the SANCdpd SQLite database file
     person_agent_code: SANCdpd's code for the default person agent
+    access_path_root: The path to the access storage location (ends with "/")
+(Note that these match the req_conf_keys list defined below.)
 
 This module exposes several global variables for use by this and other modules:
     fconf: a dictionary of config values from the config file
@@ -30,9 +32,21 @@ import os.path               # for checking for the config file
 # Global (for this module) data structures, for sharing across modules
 ###############################################################################
 
+# A list of the keys that should be found in the config file.  Program should
+# raise an error or exception if any of these is missing.
+req_conf_keys = ["logging",
+                 "logdir",
+                 "dbfile",
+                 "person_agent_code",
+                 "access_path_root"
+                 ]
+
 # Dictionary for config info from config file
 # (This shouldn't change once readfile() has been run once.)
 fconf = {}
+
+# Dictionary for config info generated during currently running session
+sconf = {}
 
 # List of event types, queried from the database.
 # Each event type is represented as an ordered triple as follows:
@@ -85,6 +99,11 @@ def readfile():
     conffp = open(pathtofile, "r")
     fconf = json.load(conffp)
     conffp.close()
+
+    # check to make sure we have the required configuration keys
+    for k in req_conf_keys:
+        if k not in fconf.keys():
+            raise Exception("Key '" + k + "' not found/read in config file.")
 
 
 
