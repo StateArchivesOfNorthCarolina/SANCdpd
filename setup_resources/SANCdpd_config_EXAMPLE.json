@@ -1,0 +1,7 @@
+{
+"person_agent_code": "OCK",
+"logging": true,
+"logdir": "D:/SANCdpd_data/logfiles/",
+"dbfile": "D:/SANCdpd_data/SANCdpd_dev.db",
+"access_path_root": "D:/SANCdpd_data/access_sto/"
+}
