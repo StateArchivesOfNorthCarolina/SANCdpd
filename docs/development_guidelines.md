@@ -1,6 +1,16 @@
 Some principles and guidance for SANCdpd development
 ====================================================
 
+# General principles
+
+## Relationship between application code and the database
+
+The SANCdpd software cannot run without the SANCdpd database.  However, the two
+should be kept separate.  The software code can depend on the database
+structure, but should never assume any particular values are stored in the
+database tables.
+
+
 
 # Resources explaining the rationale for various design choices
 
@@ -31,7 +41,20 @@ https://docs.python.org/3/faq/programming.html#how-do-i-share-global-variables-a
 
 
 
-# General resources for the tools used to build SANCdpd
+# General resources for the tools used to write SANCdpd software
+
+
+## Coding standards
+
+- Official Python Style Guide ("PEP 8")
+    - https://peps.python.org/pep-0008/
+
+- Python docstrings
+    - Use docstrings to document Python Code.  This is a very good thing to do!
+    - https://peps.python.org/pep-0257/
+
+- SQL quotation marks
+    - SQLite is lenient about quotation marks.  However, it is best to follow the SQL standard.  String literals should be enclosed by single quotes.  Column names in double quotes (when necessary).  The MySQL convention of using backticks (`grave`) quotes is discouraged.
 
 
 ## General Python resources
@@ -43,9 +66,6 @@ https://docs.python.org/3/faq/programming.html#how-do-i-share-global-variables-a
 - Official Python programming FAQ
   (Excellent list of Python-specific questions and pitfalls.)
     - https://docs.python.org/3/faq/programming.html
-
-- Official Python Style Guide ("PEP 8")
-    - https://peps.python.org/pep-0008/
 
 - Official Python 3 documentation
     - https://docs.python.org/3/
