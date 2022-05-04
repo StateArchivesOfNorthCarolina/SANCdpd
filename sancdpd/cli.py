@@ -10,8 +10,13 @@ import conf
 import logger as lg
 
 
+# The name of the software agent currently running, as known to the SANCdpd
+# database in the `agent`.`agent_name` field.
+SOFTW_AGENT_NAME = "SANCdpd CLI"
+
 # Update the version number as appropriate
 # Should match the version number noted in the project README.md file.
+# Must match the `agent`.`agent_version` field in the SANCdpd database
 VERSION = "0.0.1"
 
 
@@ -25,9 +30,9 @@ def welcome():
     print("")
     print("**************************")
     print("*                        *")
-    print("*   SANCdpd              *")
+    print("    " + SOFTW_AGENT_NAME)
     print("*                        *")
-    print("*   (ver " + VERSION + ")          *")
+    print("    (ver " + VERSION + ")")
     print("*                        *")
     print("**************************")
 
@@ -174,6 +179,10 @@ def run_proc(procname):
         lg.log("Received 'quit' command.  Exiting.")
         print("\n   Exiting now.  Goodbye.\n")
         return 0;
+    else:
+        print("Running procedure", procname, "...")
+        time.sleep(2)
+        print("Just kidding.  lol")
 
 
 ###############################################################################
@@ -194,7 +203,10 @@ def startcli():
     if conf.fconf["logging"]:
         lg.begin()
 
-    conf.validate()
+    #db.check()
+
+    # Load values from reference tables into global variables
+    conf.loadref()
 
     # Run main menu for the CLI.
     run_menu(['main'])

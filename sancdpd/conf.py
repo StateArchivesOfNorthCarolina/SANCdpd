@@ -25,9 +25,8 @@ import os.path               # for checking for the config file
 # (This shouldn't change once readfile() has been run once.)
 fconf = {}
 
-# Dictionary for confg info set within the current session
-sconf = {}
-
+event_types = []
+event_type_outcomes = []
 
 ###############################################################################
 # function: readfile
@@ -57,7 +56,7 @@ def readfile():
             found = True
             break
 
-    # Raise and exception and error out if we don't have a config file.
+    # Raise an exception and error out if we don't have a config file.
     if not found:
         raise Exception("SANCdpd config file not found.")
 
@@ -73,10 +72,13 @@ def readfile():
 
 
 ###############################################################################
-# function: validate
+# function: loadref
 ###############################################################################
-def validate():
-    """Validate the configuration and the database connection."""
-
-    # check the database connection
-    # check whether the database appears valid
+def loadref():
+    """
+    Load data from database reference tables for easy access.
+    Create global variables with data structures capturing records from
+        `event_type`
+        `event_type_outcome`
+    """
+    pass
